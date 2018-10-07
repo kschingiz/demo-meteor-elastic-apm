@@ -10,7 +10,10 @@ import { Mongo } from 'meteor/mongo';
 import { HTTP } from 'meteor/http';
 
 Meteor.startup(() => {
-  // code to run on server at startup
+  // showcase of outgoing HTTP request
+  HTTP.get("https://google.com", function(){
+    console.log(done);
+  });
 });
 
 const TestCollection = new Meteor.Collection('testCollection');
@@ -53,6 +56,16 @@ Meteor.methods({
     if(docToRemove){
       TestCollection.remove({ _id: docToRemove._id });
     }
+  },
+  testCustomAPMEvents: function(){
+    const transaction = Agent.startTransaction('myCustomTransaction', 'custom');
+    const span = Agent.startSpan('mySpan', 'custom');
+
+    // Pretending some work
+    Meteor.setTimeout(() => {
+      span.end();
+      transaction.end();
+    });
   }
 });
 
